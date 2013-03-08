@@ -1,25 +1,111 @@
-<h1>Testing ColdFusion's JSON serialization</h1>
-<p>Source code for tests: <a href="http://github.com/atuttle/cf-json-tests">http://github.com/atuttle/cf-json-tests</a> (requires MXUnit)</p>
+<cfsilent>
+<cfscript>
 
-<cfinvoke
-	component="mxunit.runner.DirectoryTestSuite"
-	method="run"
-	directory="#expandPath('tests')#"
-	componentPath="#figureOutDotPath( expandPath('tests') )#"
-	recurse="true"
-	returnvariable="results"
-/>
-<cfoutput> #results.getResultsOutput('extjs')# </cfoutput>
+	testData = {
 
-<cffunction name="figureOutDotPath" access="private" output="false" returntype="string">
-	<cfset local.indexcfmpath = cgi.script_name />
-	<cfset local.testsPath = listDeleteAt(local.indexcfmpath, listLen(local.indexcfmpath, "/"), "/") & "/tests" />
-	<cfif GetContextRoot() NEQ "">
-		<cfset local.testsPath = ReReplace(local.testsPath,"^#GetContextRoot()#","")>
-	</cfif>
-	<cfif left(local.testsPath, 1) eq '/'>
-		<cfset local.testsPath = right(local.testsPath, len(local.testsPath)-1) />
-	</cfif>
-	<cfset local.testsPath = replace(local.testsPath, "/", ".", "all") />
-	<cfreturn local.testsPath />
-</cffunction>
+		query = QueryNew("col1,col2,col3","Integer,VarChar,Bit")
+
+		,struct = { w = 1.0, x = "123", y = 123, z = "1.23" }
+
+		,octal = -077
+
+	};
+
+	QueryAddRow(testData.query);
+	QuerySetCell(testData.query,"col1",3);
+	QuerySetCell(testData.query,"col2","3");
+	QuerySetCell(testData.query,"col3",1);
+
+</cfscript>
+</cfsilent>
+<html>
+	<head>
+		<title>Testing ACF serializeJSON</title>
+		<link rel="stylesheet" href="assets/jasmine.css" />
+		<script type="text/javascript" src="assets/jasmine.js"></script>
+		<script type="text/javascript" src="assets/jasmine-html.js"></script>
+	</head>
+	<body>
+		<h1>Testing ColdFusion's JSON serialization</h1>
+		<p>Source code for tests: <a href="http://github.com/atuttle/cf-json-tests">http://github.com/atuttle/cf-json-tests</a></p>
+
+		<script type="text/javascript">
+			<cfoutput>
+				var clientTestData = #serializeJson(testData)#;
+			</cfoutput>
+
+			describe("ACF serializeJSON", function(){
+
+				//---- QUERY
+
+				it("should serialize numeric query column data to numerics", function(){
+					expect(clientTestData.QUERY.DATA[0][0]).toBe(3);
+				});
+
+				it("should serialize numeric string query column data to numeric strings", function(){
+					expect(clientTestData.QUERY.DATA[0][1]).toBe('3');
+				});
+
+				it("should serialize numeric string query column data to numeric strings", function(){
+					expect(clientTestData.QUERY.DATA[0][2]).toBe(true);
+				});
+
+				//---- STRUCTURE
+
+				it("should serialize structure keys of floating point numeric data as floating point", function(){
+					expect(clientTestData.STRUCT.W).toBe(1.0);
+				});
+
+				it("should serialize structure keys of numeric strings as numeric strings", function(){
+					expect(clientTestData.STRUCT.X).toBe('123');
+				});
+
+				it("should serialize structure keys of integers as integers", function(){
+					expect(clientTestData.STRUCT.Y).toBe(123);
+				});
+
+				it("should serialize structure keys of floating point numeric strings as floating point numeric strings", function(){
+					expect(clientTestData.STRUCT.Z).toBe('1.23');
+				});
+
+				//---- OCTAL NOTATION
+
+				it("should serialize structure keys of floating point numeric strings as floating point numeric strings", function(){
+					expect(clientTestData.OCTAL).toBe(-63);
+				});
+
+			});
+
+		</script>
+
+		<!--- initiate jasmine tests --->
+		<script>
+			(function() {
+				var jasmineEnv = jasmine.getEnv();
+				jasmineEnv.updateInterval = 1000;
+
+				var htmlReporter = new jasmine.HtmlReporter();
+
+				jasmineEnv.addReporter(htmlReporter);
+
+				jasmineEnv.specFilter = function(spec) {
+					return htmlReporter.specFilter(spec);
+				};
+
+				var currentWindowOnload = window.onload;
+
+				window.onload = function() {
+					if (currentWindowOnload) {
+						currentWindowOnload();
+					}
+					execJasmine();
+				};
+
+				function execJasmine() {
+					jasmineEnv.execute();
+				}
+
+			})();
+    </script>
+	</body>
+</html>
