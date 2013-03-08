@@ -26,7 +26,7 @@
 
 		//testcase provided by Adam Tuttle
 		function octal_notation(){
-			var s = { 'foo': -077 };
+			var s = { 'foo' = -077 };
 			var res = serializeJSON(s);
 
 			debug(res);
