@@ -8,7 +8,12 @@
 		,struct = { w = 1.0, x = "123", y = 123, z = "1.23", a = "7D7", b = "7E7", c = "7D6", d = "7E6" }
 
 		,octal = -077
-		
+
+		,doublezero = '00'
+
+		,hexcolor = '350E25'
+		,hexcolor2 = '24093D'
+
 	};
 
 	QueryAddRow(testData.query);
@@ -68,27 +73,44 @@
 					expect(clientTestData.STRUCT.Z).toBe('1.23');
 				});
 
+				//---- SCIENTIFIC NOTATION
+
 				it("should serialize structure keys of string data as strings", function(){
 					expect(clientTestData.STRUCT.A).toBe('7D7');
 				});
-				
+
 				it("should serialize structure keys of string data as strings, not numeric data in scientific notation", function(){
 					expect(clientTestData.STRUCT.B).toBe('7E7');
 				});
-				
+
 				it("should serialize structure keys of string data as strings", function(){
 					expect(clientTestData.STRUCT.C).toBe('7D6');
 				});
-				
+
 				it("should serialize structure keys of string data as strings, not numeric data in scientific notation", function(){
 					expect(clientTestData.STRUCT.D).toBe('7E6');
 				});
-					//---- OCTAL NOTATION
+
+				it("should leave scientific-looking numeric strings as strings", function(){
+					expect(clientTestData.HEXCOLOR).toBe('350E25'); //CSS color hex
+				});
+
+				it("should leave scientific-looking numeric strings as strings", function(){
+					expect(clientTestData.HEXCOLOR2).toBe('24093D'); //CSS color hex
+				});
+
+				//---- OCTAL NOTATION
 
 				it("should serialize structure keys of floating point numeric strings as floating point numeric strings", function(){
 					expect(clientTestData.OCTAL).toBe(-63);
 				});
-				
+
+				//---- OTHER NUMERIC STRING ODDITIES
+
+				it("should serialize '00' as the string '00'", function(){
+					expect(clientTestData.DOUBLEZERO).toBe('00');
+				});
+
 			});
 
 		</script>
