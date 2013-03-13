@@ -5,10 +5,10 @@
 
 		query = QueryNew("col1,col2,col3","Integer,VarChar,Bit")
 
-		,struct = { w = 1.0, x = "123", y = 123, z = "1.23" }
+		,struct = { w = 1.0, x = "123", y = 123, z = "1.23", a = "7D7", b = "7E7", c = "7D6", d = "7E6" }
 
 		,octal = -077
-
+		
 	};
 
 	QueryAddRow(testData.query);
@@ -68,12 +68,27 @@
 					expect(clientTestData.STRUCT.Z).toBe('1.23');
 				});
 
-				//---- OCTAL NOTATION
+				it("should serialize structure keys of string data as strings", function(){
+					expect(clientTestData.STRUCT.A).toBe('7D7');
+				});
+				
+				it("should serialize structure keys of string data as strings, not numeric data in scientific notation", function(){
+					expect(clientTestData.STRUCT.B).toBe('7E7');
+				});
+				
+				it("should serialize structure keys of string data as strings", function(){
+					expect(clientTestData.STRUCT.C).toBe('7D6');
+				});
+				
+				it("should serialize structure keys of string data as strings, not numeric data in scientific notation", function(){
+					expect(clientTestData.STRUCT.D).toBe('7E6');
+				});
+					//---- OCTAL NOTATION
 
 				it("should serialize structure keys of floating point numeric strings as floating point numeric strings", function(){
 					expect(clientTestData.OCTAL).toBe(-63);
 				});
-
+				
 			});
 
 		</script>
